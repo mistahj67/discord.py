@@ -1091,15 +1091,15 @@ class AutoShardedConnectionState(ConnectionState):
             await self.chunker(g, shard_id=shard_id)
             await asyncio.sleep(0.25)
 
-        # wait for the chunks
-        if chunks:
-            try:
-                await utils.sane_wait_for(chunks, timeout=len(chunks) * 30.0)
-            except asyncio.TimeoutError:
-                log.info('Somehow timed out waiting for chunks.')
-            else:
-                log.info('Finished requesting guild member chunks for %d guilds.', len(guilds))
-
+        # # wait for the chunks
+        # if chunks:
+        #     try:
+        #         await utils.sane_wait_for(chunks, timeout=len(chunks) * 30.0)
+        #     except asyncio.TimeoutError:
+        #         log.info('Somehow timed out waiting for chunks.')
+        #     else:
+        #         log.info('Finished requesting guild member chunks for %d guilds.', len(guilds))
+        log.info('Finished requesting guild member chunks for %d guilds.', len(guilds))
     async def _delay_ready(self):
         await self.shards_launched.wait()
         launch = self._ready_state.launch
