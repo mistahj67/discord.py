@@ -916,7 +916,7 @@ class ConnectionState:
         guild_id = int(data['guild_id'])
         guild = self._get_guild(guild_id)
         members = [Member(guild=guild, data=member, state=self) for member in data.get('members', [])]
-        log.debug('Processed a chunk for %s members in guild ID %s.', len(members), guild_id)
+        log.info('Processed a chunk for %s members in guild ID %s.', len(members), guild_id)
         if self._cache_members:
             for member in members:
                 existing = guild.get_member(member.id)
@@ -1080,10 +1080,16 @@ class AutoShardedConnectionState(ConnectionState):
         for guild in guilds:
             chunks.extend(self.chunks_needed(guild))
 
-        # we only want to request ~75 guilds per chunk request.
-        splits = [guilds[i:i + 75] for i in range(0, len(guilds), 75)]
-        for split in splits:
-            await self.chunker([g.id for g in split], shard_id=shard_id)
+        '''#we only want to request ~75 guilds per chunk request.
+         splits = [guilds[i:i + 75] for i in range(0, len(guilds), 75)]
+         for split in splits:
+             await self.chunker(split, shard_id=shard_id)'''
+        # MistahJ augmentation
+        # Because only 1 request per guild with Intents:
+        for g in guilds:
+            log.info('Firing RequestGuildMembers for guilds: {} ({})'.format(g.name, g.id))
+            await self.chunker(g, shard_id=shard_id)
+            await asyncio.sleep(0.25)
 
         # wait for the chunks
         if chunks:
